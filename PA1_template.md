@@ -7,27 +7,54 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 ##Loading and processing the data
 
-```{r}
+
+```r
 database<-read.csv("C:/Users/Subrata/Coursera/Coursera 5/RepData_PeerAssessment1/activity.csv", na.strings=NA)
+```
+
+```
+## Warning in file(file, "rt"): cannot open file 'C:/Users/Subrata/Coursera/
+## Coursera 5/RepData_PeerAssessment1/activity.csv': No such file or directory
+```
+
+```
+## Error in file(file, "rt"): cannot open the connection
+```
+
+```r
 str(database)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ##Analysis on total number of steps taken per day
 
-```{r compute, echo=TRUE}
+
+```r
 library(dplyr)
 stepdates<-group_by(database,date)
 TotalStepsPerDay<-summarize(stepdates, stepsperday =sum(steps,na.rm = TRUE))
 hist(TotalStepsPerDay$stepsperday, main = "Histogram of total steps taken per day", xlab = "Total steps taken per day")
+```
+
+![plot of chunk compute](figure/compute-1.png)
+
+```r
 mean<-round(mean(TotalStepsPerDay$stepsperday,na.rm=TRUE))
 median<-median(TotalStepsPerDay$stepsperday,na.rm=TRUE)
 ```
 
-It is estimated that the mean of the total number of steps taken per day is ~`r mean` steps and the median for the same is `r median` steps.
+It is estimated that the mean of the total number of steps taken per day is ~9354 steps and the median for the same is 10395 steps.
 
 ##Analysis on average daily activity pattern
 
-``` {r}
+
+```r
 intervaldates<-group_by(database,interval)
 AvgStepsPer5min<-summarize(intervaldates, stepsper5min =mean(steps,na.rm = TRUE))
 with(AvgStepsPer5min,{
@@ -37,26 +64,32 @@ with(AvgStepsPer5min,{
        ylab="Avg steps per 5 min interval",
        type ='l')
 })
-max<-round(max(AvgStepsPer5min$stepsper5min))
-maxinterval<-round(AvgStepsPer5min[round(AvgStepsPer5min$stepsper5min)==max,1]/100, digits = 2)
-
 ```
 
-The daily activiy patterns shows maximum number of steps are taken during the `r maxinterval` AM 5 min slot at `r max` steps on average.
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
+```r
+max<-round(max(AvgStepsPer5min$stepsper5min))
+maxinterval<-round(AvgStepsPer5min[round(AvgStepsPer5min$stepsper5min)==max,1]/100, digits = 2)
+```
+
+The daily activiy patterns shows maximum number of steps are taken during the 8.35 AM 5 min slot at 206 steps on average.
 
 ##Addressing missing values in the dataset
 
-``` {r missingvalue}
+
+```r
 CountNA<-max(sum(is.na(database$steps)),sum(is.na(database$interval)),sum(is.na(database$date)))
 ```
 
-There are totally `r CountNA` number of rows with missing values in the dataset. All the missing values are for the steps variable in the dataset.
+There are totally 2304 number of rows with missing values in the dataset. All the missing values are for the steps variable in the dataset.
 
 ##Missing value Imputing strategy 
 
 For every interval in a day, where there are missing values for steps, we will impute that missing step value with the avg steps taken in that interval on average in the dataset.
 
-```{r imputemissing}
+
+```r
 databaseimputed<-database
 for(i in 1:nrow(databaseimputed)){
 if(is.na(databaseimputed$steps[i])){
@@ -67,24 +100,31 @@ New database created: databaseimputed
 
 ##Recalculating total steps, mean and median of steps on imputed database
 
-```{r recompute}
+
+```r
 stepdates<-group_by(databaseimputed,date)
 TotalStepsPerDayimputed<-summarize(stepdates, stepsperday =sum(steps))
 hist(TotalStepsPerDayimputed$stepsperday, main = "Histogram of total steps taken per day", xlab = "Total steps taken per day")
+```
+
+![plot of chunk recompute](figure/recompute-1.png)
+
+```r
 recomputemean<-round(mean(TotalStepsPerDayimputed$stepsperday),digits = 2)
 recomputemedian<-median(TotalStepsPerDayimputed$stepsperday)
 ```
 
 It is estimated that:
-The mean of the total number of steps taken per day is ~`r recomputemean`steps 
-The median for the same is `r recomputemedian` steps.
+The mean of the total number of steps taken per day is ~1.076619 &times; 10<sup>4</sup>steps 
+The median for the same is 1.0766189 &times; 10<sup>4</sup> steps.
 
 
-Compared to previous computations of mean and median, the revised strategy shows an increase in mean by `r round((recomputemean - mean)/mean*100, digits = 2)`% and increase in median by `r round((recomputemedian - median)/median*100, digits =2)`% 
+Compared to previous computations of mean and median, the revised strategy shows an increase in mean by 15.1% and increase in median by 3.57% 
 
 ##Analyzing activity patterns in weekdays and weekends
 
-```{r}
+
+```r
 ## Creating new factor variable
 
 databaseimputed<-mutate(databaseimputed, weekidentified=factor((weekdays(as.Date(date))=="Saturday" |weekdays(as.Date(date))=="Sunday" ),labels=c("Weekday","Weekend")))
@@ -97,10 +137,11 @@ AvgStepsPer5min<-summarize(intervaldates, stepsper5min =mean(steps,na.rm = TRUE)
 
 library(lattice)
 xyplot(stepsper5min ~ interval | weekidentified, data= AvgStepsPer5min, layout=c(2,1), type ='l', main ="Timeline of avg steps per interval on weekdays and weekends",ylab="Steps per 5 min")
-
 ```
 
-The average number of steps in weekends is `r round(sum(subset(AvgStepsPer5min, weekidentified == "Weekend")$stepsper5min),digits=2)` steps compared to `r round(sum(subset(AvgStepsPer5min, weekidentified == "Weekday")$stepsper5min),digits=2)` steps in weekdays.
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+The average number of steps in weekends is 1.220152 &times; 10<sup>4</sup> steps compared to 1.025585 &times; 10<sup>4</sup> steps in weekdays.
 
 This shows that people walk more on weekends that on weekdays.
 
