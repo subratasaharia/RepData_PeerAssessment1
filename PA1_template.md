@@ -10,26 +10,7 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 ```r
 database<-read.csv("C:/Users/Subrata/Coursera/Coursera 5/RepData_PeerAssessment1/activity.csv", na.strings=NA)
-```
-
-```
-## Warning in file(file, "rt"): cannot open file 'C:/Users/Subrata/Coursera/
-## Coursera 5/RepData_PeerAssessment1/activity.csv': No such file or directory
-```
-
-```
-## Error in file(file, "rt"): cannot open the connection
-```
-
-```r
 str(database)
-```
-
-```
-## 'data.frame':	17568 obs. of  3 variables:
-##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ##Analysis on total number of steps taken per day
@@ -66,7 +47,7 @@ with(AvgStepsPer5min,{
 })
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)
 
 ```r
 max<-round(max(AvgStepsPer5min$stepsper5min))
@@ -139,7 +120,7 @@ library(lattice)
 xyplot(stepsper5min ~ interval | weekidentified, data= AvgStepsPer5min, layout=c(2,1), type ='l', main ="Timeline of avg steps per interval on weekdays and weekends",ylab="Steps per 5 min")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 The average number of steps in weekends is 1.220152 &times; 10<sup>4</sup> steps compared to 1.025585 &times; 10<sup>4</sup> steps in weekdays.
 

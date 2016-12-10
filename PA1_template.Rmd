@@ -7,7 +7,7 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 ##Loading and processing the data
 
-```{r}
+```{r load, results="hide"}
 database<-read.csv("C:/Users/Subrata/Coursera/Coursera 5/RepData_PeerAssessment1/activity.csv", na.strings=NA)
 str(database)
 ```
